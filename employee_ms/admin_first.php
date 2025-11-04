@@ -56,14 +56,82 @@ if (isset($_GET['sid']))
 			$smarty->assign('show_center',$show_center);
 			//$smarty->assign('xajax_javascript', $xajax->getJavascript('/xajax/'));
 			break;
-			*/
+		case 'attach':
+			$title = "上傳附加檔案";
+			$sid = "view01";
+			$modal = $m_location."/sub_modal/base/employee_ms/attach.php";
+			include $modal;
+			$smarty->assign('show_center',$show_center);
+			$smarty->assign('xajax_javascript', $xajax->getJavascript('/xajax/'));
+			break;		
+		case 'cpm':
+			$title = "修改標題";
+			$sid = "view01";
+			$modal = $m_location."/sub_modal/base/employee_ms/caption_modify.php";
+			include $modal;
+			$smarty->assign('show_center',$show_center);
+			$smarty->assign('xajax_javascript', $xajax->getJavascript('/xajax/'));
+			break;
+		case 'attach_reply':
+			$title = "上傳附加檔案";
+			$sid = "view01";
+			$modal = $m_location."/sub_modal/base/employee_ms/attach_reply.php";
+			include $modal;
+			$smarty->assign('show_center',$show_center);
+			$smarty->assign('xajax_javascript', $xajax->getJavascript('/xajax/'));
+			break;		
+		case 'replyadd':
+			$title = "新增資料".$mt;
+			if (empty($sid))
+				$sid = "view01";
+			$modal = $m_location."/sub_modal/base/employee_ms/sendreply.php";
+			include $modal;
+			$smarty->assign('show_center',$show_center);
+			$smarty->assign('xajax_javascript', $xajax->getJavascript('/xajax/'));
+			break;
+		case 'readed':
+			$title = "選取清單".$mt;
+			if (empty($sid))
+				$sid = "view01";
+			$modal = $m_location."/sub_modal/base/employee_ms/employee_readed.php";
+			include $modal;
+			$smarty->assign('show_center',$show_center);
+			break;
+		case 'jointlist':
+			$title = "協同人員名單".$mt;
+			if (empty($sid))
+				$sid = "view01";
+			$modal = $m_location."/sub_modal/base/employee_ms/projectjoint_list.php";
+			include $modal;
+			$smarty->assign('show_center',$show_center);
+			break;
+		case 'contactadd':
+			$title = "新增資料".$mt;
+			if (empty($sid))
+				$sid = "view01";
+			$modal = $m_location."/sub_modal/base/employee_ms/employee_contact_add.php";
+			include $modal;
+			$smarty->assign('show_center',$show_center);
+			$smarty->assign('xajax_javascript', $xajax->getJavascript('/xajax/'));
+			break;
+		case 'contactedit':
+			$title = "資料編輯".$mt;
+			if (empty($sid))
+				$sid = "view01";
+			$modal = $m_location."/sub_modal/base/employee_ms/employee_contact_modify.php";
+			include $modal;
+			$smarty->assign('show_center',$show_center);
+			$smarty->assign('xajax_javascript', $xajax->getJavascript('/xajax/'));
+			break;
+						*/
 		case 'importexcel':
-			$title = "匯入員工Excel資料檔".$mt;
+			$title = "匯入客戶Excel資料檔".$mt;
 			$sid = "view01";
 			$modal = $m_location."/sub_modal/base/employee_ms/importexcel.php";
 			include $modal;
 			$smarty->assign('show_center',$show_center);
 			break;
+
 		case 'exportexcel':
 			$title = "匯出員工Excel資料檔".$mt;
 			$sid = "view01";
@@ -78,6 +146,22 @@ if (isset($_GET['sid']))
 			$modal = $m_location."/sub_modal/base/employee_ms/employee_report.php";
 			include $modal;
 			$smarty->assign('show_center',$show_center);
+			break;
+		case 'excelreport':
+			$title = "匯出Excel報表".$mt;
+			if (empty($sid))
+				$sid = "view01";
+			$modal = $m_location."/sub_modal/base/employee_ms/employee_report_excel.php";
+			include $modal;
+			$smarty->assign('show_center',$show_center);
+			break;
+		case 'salary':
+			$title = "薪資設定";
+			$sid = "view01";
+			$modal = $m_location."/sub_modal/base/employee_ms/employee_salary.php";
+			include $modal;
+			$smarty->assign('show_center',$show_center);
+			$smarty->assign('xajax_javascript', $xajax->getJavascript('/xajax/'));
 			break;
 			*/
 		default:

@@ -31,7 +31,7 @@
 	
 	$aColumns = array( 'a.employee_id','a.employee_name','a.id_number','a.gender','a.birthday','a.blood_type','a.mobile_no','a.emergency_contact','a.emergency_mobile_no','a.start_date','a.seniority'
 			,'a.zipcode','a.county','a.town','a.address','a.auto_seq','a.member_no','a.employee_type','a.company_id','b.company_name','a.team_id'
-			,'c.team_name','a.construction_id','d.construction_site','a.old_employee_id','a.department');
+			,'c.team_name','a.construction_id','d.construction_site','a.old_employee_id','a.department','a.resignation_date');
 	
 	/* Indexed column (used for fast and accurate table cardinality) */
 	$sIndexColumn = "auto_seq";

@@ -102,8 +102,9 @@ if (!empty($_FILES)) {
 				$construction_id = htmlentities(trim($data["T"]), ENT_QUOTES, 'UTF-8');
 				$member_no = htmlentities(trim($data["U"]), ENT_QUOTES, 'UTF-8');
 				$actual_insurance = htmlentities(trim($data["V"]), ENT_QUOTES, 'UTF-8');
-				$department = htmlentities(trim($data["W"]), ENT_QUOTES, 'UTF-8');
-				$employee_content = htmlentities(trim($data["X"]), ENT_QUOTES, 'UTF-8');
+				$labor_health_insurance = htmlentities(trim($data["W"]), ENT_QUOTES, 'UTF-8');
+				$labor_Pension = htmlentities(trim($data["X"]), ENT_QUOTES, 'UTF-8');
+				$employee_content = htmlentities(trim($data["Y"]), ENT_QUOTES, 'UTF-8');
 				
 				//檢查是否重複
 				$employee_row = getkeyvalue2($site_db."_info","employee","employee_id = '$employee_id'","count(*) as e_count");
@@ -136,7 +137,8 @@ if (!empty($_FILES)) {
 					,construction_id  = '$construction_id'
 					,member_no  = '$member_no'
 					,actual_insurance  = '$actual_insurance'
-					,department  = '$department'
+					,labor_health_insurance  = '$labor_health_insurance'
+					,labor_Pension 	= '$labor_Pension'
 					,employee_content  = '$employee_content'
 					,last_modify  = now()
 					where employee_id = '$employee_id'";

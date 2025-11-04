@@ -238,10 +238,10 @@ $list_view=<<<EOT
 		<thead class="table-light border-dark">
 			<tr style="border-bottom: 1px solid #000;">
 				<th scope="col" class="text-start text-nowrap" style="width:10%;">姓名/工號/舊工號</th>
-				<th scope="col" class="text-start" style="width:17%;">身分證/出生日/血型/電話</th>
+				<th scope="col" class="text-start" style="width:15%;">身分證/出生日/血型/電話</th>
 				<th scope="col" class="text-start" style="width:8%;">緊急連絡人</th>
-				<th scope="col" class="text-start" style="width:25%;">地址/附檔</th>
-				<th scope="col" class="text-center" style="width:10%;">入職日期/年資</th>
+				<th scope="col" class="text-start" style="width:22%;">地址/附檔</th>
+				<th scope="col" class="text-center" style="width:15%;">入職-離職日期/年資</th>
 				<th scope="col" class="text-start" style="width:26%;">公司/職務/團隊/工地</th>
 				<th scope="col" class="text-center text-nowrap" style="width:5%;">處理</th>
 			</tr>
@@ -409,10 +409,18 @@ $list_view
 				if (aData[9] != null && aData[9] != "" && aData[9] != "0000-00-00") {
 					var start_date = new Date(aData[9]);
 
-					const difference = getDifferenceInYMD(start_date);
-					seniority = difference.years+'年'+difference.months+'月'+difference.days+'天';
+					//檢查離職日期是否有設定
+					if (aData[26] != null && aData[26] != "" && aData[26] != "0000-00-00") {
+						var end_date = new Date(aData[26]);
+						const difference = getDifferenceInYMD(start_date,end_date);
+						seniority = difference.years+'年'+difference.months+'月'+difference.days+'天';
+						$('td:eq(4)', nRow).html( '<div class="text-center size12 weight">'+aData[9]+' ～ '+aData[26]+'</div><div class="text-center"><div class="inline">'+seniority+'</div><div class="inline red ms-1">已離職</div></div>' );
+					} else {
+						const difference = getDifferenceInYMD(start_date);
+						seniority = difference.years+'年'+difference.months+'月'+difference.days+'天';
+						$('td:eq(4)', nRow).html( '<div class="text-center size12 weight">'+aData[9]+'</div><div class="text-center">'+seniority+'</div>' );
+					}
 
-					$('td:eq(4)', nRow).html( '<div class="text-center size12 weight">'+aData[9]+'</div><div class="text-center">'+seniority+'</div>' );
 				} else {
 					$('td:eq(4)', nRow).html( '' );
 				}
