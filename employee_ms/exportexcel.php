@@ -10,6 +10,12 @@ date_default_timezone_set("Asia/Taipei");
 $site_db = "eshop";
 $web_id  = "sales.eshop";
 
+$super_admin = "N";
+$super_advanced = "N";
+$mem_row = getkeyvalue2('memberinfo','member',"member_no = '$memberID'",'admin,advanced,checked,luck,admin_readonly,advanced_readonly');
+$super_admin = $mem_row['admin'];
+$super_advanced = $mem_row['advanced'];
+
 // ----------------------------------------------------
 // 載入共用函數與資料庫
 // ----------------------------------------------------
@@ -51,8 +57,49 @@ $sheet->fromArray($headers, NULL, 'A1');
 // 取資料 (PHP 7.4 安全寫法)
 // ----------------------------------------------------
 $mDB = new MywebDB();
+if (($powerkey=="A") || ($super_admin=="Y")) {
 
-$sql = "SELECT * FROM employee ORDER BY employee_id ";
+		$sql = "SELECT 
+                a.employee_id, a.employee_name, a.id_number, a.gender, a.birthday, 
+                a.blood_type, a.mobile_no, a.emergency_contact, a.emergency_mobile_no, 
+                a.start_date, a.seniority, a.zipcode, a.county, a.town, a.address, 
+                a.auto_seq, a.member_no, a.employee_type, a.company_id, b.company_name, 
+                a.team_id, c.team_name, a.construction_id, d.construction_site, 
+                a.old_employee_id, a.actual_insurance,a.labor_health_insurance,a.labor_Pension,a.employee_content
+            FROM employee a
+            LEFT JOIN company b ON b.company_id = a.company_id
+			LEFT JOIN team c ON c.team_id = a.team_id
+			LEFT JOIN construction d ON d.construction_id = a.construction_id
+            WHERE a.company_id IS NOT NULL 
+            AND a.company_id <> '';
+
+		";
+
+	} else {
+
+		$sql = "SELECT 
+                a.employee_id, a.employee_name, a.id_number, a.gender, a.birthday, 
+                a.blood_type, a.mobile_no, a.emergency_contact, a.emergency_mobile_no, 
+                a.start_date, a.seniority, a.zipcode, a.county, a.town, a.address, 
+                a.auto_seq, a.member_no, a.employee_type, a.company_id, b.company_name, 
+                a.team_id, c.team_name, a.construction_id, d.construction_site, 
+                a.old_employee_id, a.actual_insurance,a.labor_health_insurance,a.labor_Pension,a.employee_content
+            FROM employee a
+            LEFT JOIN company b 
+                ON b.company_id = a.company_id
+            LEFT JOIN team c 
+                ON c.team_id = a.team_id
+            LEFT JOIN construction d 
+                ON d.construction_id = a.construction_id
+            RIGHT JOIN group_company e 
+                ON e.company_id = a.company_id 
+            AND e.member_no = '$memberID'
+            WHERE a.company_id IS NOT NULL 
+            AND a.company_id <> '';
+		";
+
+	}
+
 $mDB->query($sql);
 
 $rows = [];
