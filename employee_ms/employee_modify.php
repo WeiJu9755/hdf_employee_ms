@@ -180,6 +180,9 @@ if ($total > 0) {
 	$seniority = $row['seniority'];
 	$county = $row['county'];
 	$town = $row['town'];
+	if ($county == '彰化縣' && $town == '員林鎮') {
+		$town = '員林市';
+	}
 	$zipcode = $row['zipcode'];
 	$address = $row['address'];
 	$employee_content = $row['employee_content'];
@@ -419,6 +422,15 @@ EOT;
 
 $show_center=<<<EOT
 <script src="/os/aj-address/js/aj-address.js" type="text/javascript"></script>
+<script>
+if (zip["彰化縣"] && zip["彰化縣"]["員林鎮"]) {
+	var changhuaZip = {};
+	for (var zipTown in zip["彰化縣"]) {
+		changhuaZip[zipTown == "員林鎮" ? "員林市" : zipTown] = zip["彰化縣"][zipTown];
+	}
+	zip["彰化縣"] = changhuaZip;
+}
+</script>
 
 <script src="/os/Autogrow-Textarea/jquery.autogrowtextarea.min.js"></script>
 
