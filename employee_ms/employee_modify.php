@@ -299,13 +299,16 @@ if ($mDB->rowCount() > 0) {
 }
 
 //載入所有工地
-$Qry="SELECT construction_id,construction_site FROM construction ORDER BY construction_id";
+$Qry="SELECT construction_id,construction_site,isclosed FROM construction ORDER BY construction_id";
 $mDB->query($Qry);
 $select_construction = "";
 $select_construction .= "<option></option>";
 
 if ($mDB->rowCount() > 0) {
 	while ($row=$mDB->fetchRow(2)) {
+		if ($row['isclosed'] == 'Y') {
+			continue;
+		}
 		$ch_construction_id = $row['construction_id'];
 		$ch_construction_site = $row['construction_site'];
 		$select_construction .= "<option value=\"$ch_construction_id\" ".mySelect($ch_construction_id,$construction_id).">$ch_construction_site $ch_construction_id</option>";
