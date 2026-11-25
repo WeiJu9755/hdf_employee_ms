@@ -284,7 +284,7 @@ $list_view
 			},//RWD響應式
 			"scrollX": '$scroll',
 			"paging": true,
-			"pageLength": -1,
+			"pageLength": 25,
 			"lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
 			"pagingType": "full_numbers",  //分页样式： simple,simple_numbers,full,full_numbers
 			"searching": true,  //禁用原生搜索

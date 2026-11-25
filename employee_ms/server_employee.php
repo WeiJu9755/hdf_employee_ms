@@ -50,11 +50,12 @@
 	/* 
 	 * MySQL connection
 	 */
-	$gaSql['link'] =  mysql_pconnect( $gaSql['server'], $gaSql['user'], $gaSql['password'] ) or
+	$gaSql['link'] =  mysqli_connect( $gaSql['server'], $gaSql['user'], $gaSql['password'], $gaSql['db'] ) or
 		die( 'Could not open connection to server' );
 	
-	mysql_select_db( $gaSql['db'], $gaSql['link'] ) or 
-		die( 'Could not select database '. $gaSql['db'] );
+	// 既有資料以 latin1 連線讀取時回傳 UTF-8 位元組；維持原清單的編碼行為。
+	mysqli_set_charset( $gaSql['link'], 'latin1' );
+	$memberID_sql = mysqli_real_escape_string( $gaSql['link'], $memberID );
 	
 	/* 
 	 * Paging
@@ -62,8 +63,8 @@
 	$sLimit = "";
 	if ( isset( $_GET['iDisplayStart'] ) && $_GET['iDisplayLength'] != '-1' )
 	{
-		$sLimit = "LIMIT ".mysql_real_escape_string( $_GET['iDisplayStart'] ).", ".
-			mysql_real_escape_string( $_GET['iDisplayLength'] );
+		$sLimit = "LIMIT ".max(0, intval($_GET['iDisplayStart'])).", ".
+			max(1, intval($_GET['iDisplayLength']));
 	}
 	
 	
@@ -80,7 +81,7 @@
 			if ( $_GET[ 'bSortable_'.intval($_GET['iSortCol_'.$i]) ] == "true" )
 			{
 				$sOrder .= $aColumns[ intval( $_GET['iSortCol_'.$i] ) ]."
-				 	".mysql_real_escape_string( $_GET['sSortDir_'.$i] ) .", ";
+				".mysqli_real_escape_string( $gaSql['link'], $_GET['sSortDir_'.$i] ) .", ";
 			}
 		}
 		
@@ -99,12 +100,12 @@
 	 * on very large tables, and MySQL's regex functionality is very limited
 	 */
 	$sWhere = "";
-	if ( $_GET['sSearch'] != "" )
+	if ( isset($_GET['sSearch']) && $_GET['sSearch'] != "" )
 	{
 		$sWhere = "WHERE (";
 		for ( $i=0 ; $i<count($aColumns) ; $i++ )
 		{
-			$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
+			$sWhere .= $aColumns[$i]." LIKE '%".mysqli_real_escape_string( $gaSql['link'], $_GET['sSearch'] )."%' OR ";
 		}
 		$sWhere = substr_replace( $sWhere, "", -3 );
 		$sWhere .= ')';
@@ -113,7 +114,7 @@
 	/* Individual column filtering */
 	for ( $i=0 ; $i<count($aColumns) ; $i++ )
 	{
-		if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
+		if ( isset($_GET['bSearchable_'.$i], $_GET['sSearch_'.$i]) && $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
 		{
 			if ( $sWhere == "" )
 			{
@@ -123,7 +124,7 @@
 			{
 				$sWhere .= " AND ";
 			}
-			$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
+			$sWhere .= $aColumns[$i]." LIKE '%".mysqli_real_escape_string($gaSql['link'], $_GET['sSearch_'.$i])."%' ";
 		}
 	}
 	
@@ -182,9 +183,9 @@
 	} else {
 
 		if ($sWhere=="")
-			$sWhere = "WHERE (e.member_no = '$memberID') ";
+			$sWhere = "WHERE (e.member_no = '$memberID_sql') ";
 		else
-			$sWhere .= " and (e.member_no = '$memberID') ";
+			$sWhere .= " and (e.member_no = '$memberID_sql') ";
 
 
 		$sQuery = "
@@ -193,21 +194,21 @@
 			LEFT JOIN company b ON b.company_id = a.company_id
 			LEFT JOIN team c ON c.team_id = a.team_id
 			LEFT JOIN construction d ON d.construction_id = a.construction_id
-			RIGHT JOIN group_company e ON e.company_id = a.company_id and e.member_no = '$memberID'
+			RIGHT JOIN group_company e ON e.company_id = a.company_id and e.member_no = '$memberID_sql'
 			$sWhere
 			$sOrder
 			$sLimit
 		";
 
 	}
-	$rResult = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
+	$rResult = mysqli_query( $gaSql['link'], $sQuery ) or die(mysqli_error($gaSql['link']));
 	
 	/* Data set length after filtering */
 	$sQuery = "
 		SELECT FOUND_ROWS()
 	";
-	$rResultFilterTotal = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
-	$aResultFilterTotal = mysql_fetch_array($rResultFilterTotal);
+	$rResultFilterTotal = mysqli_query( $gaSql['link'], $sQuery ) or die(mysqli_error($gaSql['link']));
+	$aResultFilterTotal = mysqli_fetch_array($rResultFilterTotal);
 	$iFilteredTotal = $aResultFilterTotal[0];
 	
 	/* Total data set length */
@@ -215,8 +216,8 @@
 		SELECT COUNT(".$sIndexColumn.")
 		FROM   $sTable
 	";
-	$rResultTotal = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
-	$aResultTotal = mysql_fetch_array($rResultTotal);
+	$rResultTotal = mysqli_query( $gaSql['link'], $sQuery ) or die(mysqli_error($gaSql['link']));
+	$aResultTotal = mysqli_fetch_array($rResultTotal);
 	$iTotal = $aResultTotal[0];
 	
 	
@@ -230,7 +231,7 @@
 		"aaData" => array()
 	);
 	
-	while ( $aRow = mysql_fetch_array( $rResult ) )
+	while ( $aRow = mysqli_fetch_array( $rResult ) )
 	{
 		$row = array();
 		for ( $i=0 ; $i<count($aColumns) ; $i++ )
@@ -256,8 +257,20 @@
 				
 			}
 		}
+		foreach ($row as $i => $value) {
+			if (is_string($value) && preg_match('//u', $value) !== 1) {
+				error_log('server_employee.php: invalid UTF-8, employee auto_seq=' . $aRow['auto_seq'] . ', column=' . $aColumns[$i]);
+			}
+		}
 		$output['aaData'][] = $row;
 	}
 	
-	echo json_encode( $output );
+	header('Content-Type: application/json; charset=utf-8');
+	$json = json_encode( $output, JSON_INVALID_UTF8_SUBSTITUTE );
+	if ($json === false) {
+		error_log('server_employee.php: JSON encoding failed: ' . json_last_error_msg());
+		http_response_code(500);
+		exit;
+	}
+	echo $json;
 ?>
